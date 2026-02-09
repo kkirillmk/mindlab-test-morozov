@@ -9,13 +9,20 @@ use App\Models\Role;
 use App\Services\RoleService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Knuckles\Scribe\Attributes\Group;
 
+#[Group('Роли', 'Управление ролями пользователей (только для администраторов)')]
 class RoleController extends Controller
 {
     public function __construct(
         private readonly RoleService $roleService
     ) {}
 
+    /**
+     * Список ролей
+     * 
+     * Получить список всех ролей. Требуется роль администратора.
+     */
     public function index(): AnonymousResourceCollection
     {
         $roles = $this->roleService->getAllRoles();
@@ -23,6 +30,11 @@ class RoleController extends Controller
         return RoleResource::collection($roles);
     }
 
+    /**
+     * Создать роль
+     * 
+     * Создать новую роль. Требуется роль администратора.
+     */
     public function store(StoreRoleRequest $request): JsonResponse
     {
         $role = $this->roleService->createRole($request->toDTO());
@@ -32,6 +44,11 @@ class RoleController extends Controller
         ], 201);
     }
 
+    /**
+     * Удалить роль
+     * 
+     * Удалить роль. Требуется роль администратора.
+     */
     public function destroy(Role $role): JsonResponse
     {
         $this->roleService->deleteRole($role);

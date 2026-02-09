@@ -9,13 +9,22 @@ use App\Http\Requests\Api\V1\RefreshRequest;
 use App\Services\Auth\Contracts\AuthServiceInterface;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
+use Knuckles\Scribe\Attributes\Group;
+use Knuckles\Scribe\Attributes\Unauthenticated;
 
+#[Group('Аутентификация', 'Эндпоинты для входа, выхода и обновления токенов')]
 class AuthController extends Controller
 {
     public function __construct(
         private readonly AuthServiceInterface $authService
     ) {}
 
+    /**
+     * Вход в систему
+     * 
+     * Аутентификация пользователя и получение пары токенов (access_token и refresh_token).
+     */
+    #[Unauthenticated]
     public function login(LoginRequest $request): JsonResponse
     {
         $tokenPair = $this->authService->login($request->toDTO());
@@ -25,6 +34,11 @@ class AuthController extends Controller
         ]);
     }
 
+    /**
+     * Выход из системы
+     * 
+     * Отзывает текущие токены доступа и обновления.
+     */
     public function logout(LogoutRequest $request): Response
     {
         $accessToken = $request->bearerToken();
@@ -37,6 +51,12 @@ class AuthController extends Controller
         return response()->noContent();
     }
 
+    /**
+     * Обновление токена доступа
+     * 
+     * Обновляет access_token используя refresh_token.
+     */
+    #[Unauthenticated]
     public function refresh(RefreshRequest $request): JsonResponse
     {
         $refreshToken = $request->input('refresh_token');
