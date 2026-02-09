@@ -1,6 +1,8 @@
 <?php
 
-use App\Services\Auth\Exceptions\AuthException;
+use App\Exceptions\DomainException;
+use App\Http\Middleware\EnsureUserHasRole;
+use App\Http\Middleware\EnsureUserIsActive;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -12,11 +14,13 @@ return Application::configure(basePath: dirname(__DIR__))
         commands: __DIR__.'/../routes/console.php',
     )
     ->withMiddleware(function (Middleware $middleware) {
+        $middleware->alias([
+            'role' => EnsureUserHasRole::class,
+            'active' => EnsureUserIsActive::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
-        $exceptions->render(function (AuthException $e) {
-            return response()->json([
-                'message' => $e->getMessage(),
-            ], $e->getStatusCode());
+        $exceptions->render(function (DomainException $e) {
+            return response()->json($e->toArray(), $e->getStatusCode());
         });
     })->create();

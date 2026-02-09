@@ -3,28 +3,39 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Api\V1\StoreRoleRequest;
+use App\Http\Resources\Api\V1\RoleResource;
+use App\Models\Role;
+use App\Services\RoleService;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
-class RoleController extends Controller // todo доделать
+class RoleController extends Controller
 {
-    public function index(): JsonResponse
+    public function __construct(
+        private readonly RoleService $roleService
+    ) {}
+
+    public function index(): AnonymousResourceCollection
     {
-        return response()->json(['message' => 'Список ролей']);
+        $roles = $this->roleService->getAllRoles();
+
+        return RoleResource::collection($roles);
     }
 
-    public function store(Request $request): JsonResponse
+    public function store(StoreRoleRequest $request): JsonResponse
     {
-        return response()->json(['message' => 'Создание роли']);
+        $role = $this->roleService->createRole($request->toDTO());
+
+        return response()->json([
+            'data' => RoleResource::make($role),
+        ], 201);
     }
 
-    public function show(string $id): JsonResponse
+    public function destroy(Role $role): JsonResponse
     {
-        return response()->json(['message' => 'Просмотр роли']);
-    }
+        $this->roleService->deleteRole($role);
 
-    public function destroy(string $id): JsonResponse
-    {
-        return response()->json(['message' => 'Удаление роли']);
+        return response()->json(null, 204);
     }
 }

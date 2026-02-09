@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Api\V1;
 
+use App\Services\Auth\DTO\Credentials;
 use Illuminate\Foundation\Http\FormRequest;
 
 class LoginRequest extends FormRequest
@@ -29,5 +30,15 @@ class LoginRequest extends FormRequest
             'password.min' => 'Пароль должен содержать минимум :min символов',
             'password.max' => 'Пароль не может быть длиннее :max символов',
         ];
+    }
+
+    public function toDTO(): Credentials
+    {
+        $validated = $this->validated();
+        
+        return new Credentials(
+            email: $validated['email'],
+            password: $validated['password']
+        );
     }
 }

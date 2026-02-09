@@ -13,6 +13,8 @@ class UserResource extends JsonResource
             'id' => $this->id,
             'name' => $this->name,
             'email' => $this->email,
+            'is_active' => $this->is_active,
+            'roles' => RoleResource::collection($this->whenLoaded('roles')),
             'created_at' => $this->created_at->toISOString(),
             'updated_at' => $this->updated_at->toISOString(),
         ];

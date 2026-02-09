@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use PHPOpenSourceSaver\JWTAuth\Exceptions\JWTException;
 use PHPOpenSourceSaver\JWTAuth\Facades\JWTAuth;
+use Throwable;
 
 readonly class JwtAuthService implements AuthServiceInterface
 {
@@ -41,9 +42,16 @@ readonly class JwtAuthService implements AuthServiceInterface
             throw AuthException::invalidCredentials($e->getMessage());
         }
 
+        if (!$user->is_active) {
+            throw AuthException::accountDeactivated();
+        }
+
         return $this->respondWithTokens($accessToken, $user);
     }
 
+    /**
+     * @throws Throwable
+     */
     public function refresh(string $refreshToken): TokenPair
     {
         return DB::transaction(function () use ($refreshToken) {

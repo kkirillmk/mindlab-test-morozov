@@ -3,7 +3,11 @@
 namespace App\Providers;
 
 use App\Repositories\Contracts\RefreshTokenRepositoryInterface;
+use App\Repositories\Contracts\RoleRepositoryInterface;
+use App\Repositories\Contracts\UserRepositoryInterface;
 use App\Repositories\RefreshTokenRepository;
+use App\Repositories\RoleRepository;
+use App\Repositories\UserRepository;
 use App\Services\Auth\Contracts\AuthServiceInterface;
 use App\Services\Auth\Contracts\CurrentUserProviderInterface;
 use App\Services\Auth\JwtAuthService;
@@ -17,6 +21,16 @@ class AppServiceProvider extends ServiceProvider
         $this->app->scoped(
             RefreshTokenRepositoryInterface::class,
             RefreshTokenRepository::class
+        );
+
+        $this->app->scoped(
+            UserRepositoryInterface::class,
+            UserRepository::class
+        );
+
+        $this->app->scoped(
+            RoleRepositoryInterface::class,
+            RoleRepository::class
         );
 
         $this->app->scoped(
